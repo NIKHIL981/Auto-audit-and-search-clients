@@ -1,0 +1,6 @@
+{
+  "name": "Website Audit & AI Readiness Suite",
+  "description": "Production-grade website audit, AI search engine readiness, and automated Google Places SEO client prospecting suite for discovering businesses, auditing sites, and generating qualified leads.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
