@@ -422,6 +422,15 @@ export const ClientOutreachDashboard: React.FC<ClientOutreachDashboardProps> = (
           return (a.seoHealthScore || 0) - (b.seoHealthScore || 0);
       }
     });
+
+    // Enforce strict uniqueness of client records
+    const seenIds = new Set<string>();
+    return sorted.filter((c, idx) => {
+      const key = c.id || `client-${idx}`;
+      if (seenIds.has(key)) return false;
+      seenIds.add(key);
+      return true;
+    });
   }, [filteredClients, sortBy]);
 
   // Aggregate stats

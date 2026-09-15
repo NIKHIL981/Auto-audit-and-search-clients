@@ -537,6 +537,43 @@ export interface ProspectAuditSummary {
   responseTimeMs: number;
 }
 
+export interface RealAuditDetails {
+  basedOnHomepageOnly: boolean;
+  technical: {
+    https: boolean;
+    sitemap: boolean;
+    robotsTxt: boolean;
+    canonical: boolean;
+  };
+  onPage: {
+    titleTag: boolean;
+    titleText?: string;
+    metaDescription: boolean;
+    metaDescriptionText?: string;
+    h1: boolean;
+    altText: boolean;
+    missingAltCount: number;
+  };
+  performance: {
+    pageLoadTimeMs: number;
+    imageFormat: string;
+  };
+  mobile: {
+    viewportMeta: boolean;
+    touchTargets: boolean;
+  };
+  schema: {
+    localBusiness: boolean;
+    faq: boolean;
+    review: boolean;
+  };
+  contact: {
+    phoneOnPage: boolean;
+    emailOnPage: boolean;
+    addressOnPage: boolean;
+  };
+}
+
 export interface ClientMarketingEvidence {
   hasGoogleAnalytics: boolean;
   hasMetaPixel: boolean;
@@ -588,6 +625,7 @@ export interface ClientProspect {
   quickWinFixes: string[]; // 3 quick wins the agency can deliver in week 1
   coldCallScript: string; // 30-sec conversational phone opener for sales
   linkedInPitch?: string;
+  whatsAppMessage?: string;
 
   // Specific Flaws for Cold Pitch
   topDeficiencies: string[];
@@ -602,6 +640,22 @@ export interface ClientProspect {
   reportStatus?: 'idle' | 'queued' | 'generating' | 'ready' | 'error';
   lastReportGeneratedAt?: number;
   potentialRoiScore?: number; // Combined Potential ROI score based on AI readiness & technical severity
+
+  // Client Prospecting Intelligence & Qualification
+  leadPotentialScore?: number; // 1 - 10 rating based on conditions
+  leadTier?: 'hot' | 'good' | 'skip'; // 🔥 Hot Lead (8-10), ✅ Good Lead (5-7), ⬇️ Skip (<5)
+  leadReason?: string; // Why they're a good lead
+  goodLeadReasons?: string[]; // Multiple specific reasons why they're a good lead
+  contactCompleteness?: 'full' | 'partial' | 'minimal'; // Full ✅, Partial ⚠️, Minimal 📞
+  ownerName?: string; // Owner / Manager / Lead Professional extracted from site
+  servicesOffered?: string[]; // Top services extracted from real site
+  businessHours?: string[]; // Business opening hours
+  verifiedReal?: boolean; // Confirmed real business from Google Places
+  realAuditDetails?: RealAuditDetails; // Verification audit breakdown (homepage only)
+  mapsUrl?: string; // Direct link to Google Maps place
+  cmsType?: string; // WordPress, Wix, Shopify, Squarespace, Custom
+  seoScore?: number; // Real calculated audit score (0-100)
+  overallScore?: number; // Alias for overall score
 
   // CRM Sync Status
   crmSynced?: boolean;
@@ -786,6 +840,21 @@ export interface ProspectScanRequest {
   highTicketOnly?: boolean;
   minViabilityScore?: number;
   requireContact?: boolean;
+}
+
+export interface ProspectScanResponse {
+  success: boolean;
+  rawPlacesFound: number;
+  hotLeadsCount: number;
+  goodLeadsCount: number;
+  filteredCount: number;
+  qualifiedCount: number;
+  suggestions?: string[];
+  source: string;
+  niche: string;
+  location: string;
+  prospects: ClientProspect[];
+  message?: string;
 }
 
 export interface ReportSectionsSelection {

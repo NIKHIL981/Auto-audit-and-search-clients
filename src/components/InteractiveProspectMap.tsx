@@ -264,7 +264,7 @@ export const InteractiveProspectMap: React.FC<InteractiveProspectMapProps> = ({
 
             return (
               <g
-                key={p.id || idx}
+                key={`pin-${p.id || 'pos'}-${idx}`}
                 transform={`translate(${x}, ${y})`}
                 className="cursor-pointer transition-transform duration-200"
                 onClick={() => onSelectProspect(p)}

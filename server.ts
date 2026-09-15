@@ -163,9 +163,9 @@ app.post('/api/prospector/scan', async (req, res) => {
       minViabilityScore,
       sources,
     } = req.body;
-    const count = Math.min(1000, Math.max(5, Number(targetCount) || 20));
+    const count = Math.min(20, Math.max(5, Number(targetCount) || 20));
 
-    const prospects = await prospectClients({
+    const result = await prospectClients({
       niche: String(niche).trim() || 'Dentist',
       location: String(location).trim() || 'Austin, TX',
       targetCount: count,
@@ -179,11 +179,19 @@ app.post('/api/prospector/scan', async (req, res) => {
 
     return res.json({
       success: true,
-      totalFound: prospects.length,
+      totalFound: result.prospects.length,
+      rawPlacesFound: result.rawPlacesFound,
+      hotLeadsCount: result.hotLeadsCount,
+      goodLeadsCount: result.goodLeadsCount,
+      filteredCount: result.filteredCount,
+      qualifiedCount: result.qualifiedCount,
+      suggestions: result.suggestions,
+      message: result.message,
+      source: result.source,
       niche,
       location,
       strategy,
-      prospects,
+      prospects: result.prospects,
     });
   } catch (error: any) {
     console.error('Prospector scan failed:', error);
@@ -202,7 +210,7 @@ app.post('/api/prospector/audit-urls', async (req, res) => {
       return res.status(400).json({ error: 'Please provide an array of website URLs to audit.' });
     }
 
-    const prospects = await prospectClients({
+    const result = await prospectClients({
       niche: String(niche).trim() || 'Services',
       location: String(location).trim() || 'Local Market',
       targetCount: urls.length,
@@ -212,8 +220,10 @@ app.post('/api/prospector/audit-urls', async (req, res) => {
 
     return res.json({
       success: true,
-      totalAudited: prospects.length,
-      prospects,
+      totalAudited: result.prospects.length,
+      prospects: result.prospects,
+      rawPlacesFound: result.rawPlacesFound,
+      filteredCount: result.filteredCount,
     });
   } catch (error: any) {
     console.error('Bulk URLs audit failed:', error);

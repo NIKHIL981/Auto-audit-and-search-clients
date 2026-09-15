@@ -248,6 +248,54 @@ const SEED_CLIENTS: ClientProspect[] = [
 ];
 
 /**
+ * Sanitize and strictly deduplicate clients by ID, domain, and company name.
+ * Resolves any key collisions by regenerating unique IDs.
+ */
+export function deduplicateClients(items: ClientProspect[]): ClientProspect[] {
+  if (!Array.isArray(items)) return [];
+  const seenIds = new Set<string>();
+  const seenDomains = new Set<string>();
+  const uniqueList: ClientProspect[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (!item) continue;
+
+    // Domain normalization
+    const rawDom = (item.domain || item.websiteUrl || '')
+      .toLowerCase()
+      .replace(/^https?:\/\//, '')
+      .replace(/\/.*$/, '')
+      .trim();
+
+    // Exact duplicate business by domain or cname check
+    const businessKey = rawDom || item.cname?.toLowerCase().trim();
+    if (businessKey && seenDomains.has(businessKey)) {
+      continue; // Skip duplicate business listing
+    }
+    if (businessKey) {
+      seenDomains.add(businessKey);
+    }
+
+    // Enforce guaranteed unique ID
+    let safeId = item.id;
+    if (!safeId || seenIds.has(safeId)) {
+      const prefix = safeId ? safeId.replace(/[^a-zA-Z0-9_-]/g, '') : 'prospect';
+      safeId = `${prefix}-${i}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`;
+    }
+    seenIds.add(safeId);
+
+    uniqueList.push({
+      ...item,
+      id: safeId,
+      pipelineStage: resolveProspectStage(item),
+    });
+  }
+
+  return uniqueList;
+}
+
+/**
  * Load all clients from localStorage, seeded with defaults if empty
  */
 export function loadClients(): ClientProspect[] {
@@ -256,10 +304,14 @@ export function loadClients(): ClientProspect[] {
     if (raw) {
       const parsed: ClientProspect[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((p) => ({
-          ...p,
-          pipelineStage: resolveProspectStage(p),
-        }));
+        const cleaned = deduplicateClients(parsed);
+        // If duplicates or collision were sanitized, update localStorage
+        if (cleaned.length !== parsed.length || cleaned.some((c, idx) => c.id !== parsed[idx]?.id)) {
+          try {
+            localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(cleaned));
+          } catch {}
+        }
+        return cleaned;
       }
     }
   } catch (err) {
@@ -267,10 +319,11 @@ export function loadClients(): ClientProspect[] {
   }
 
   // Seed default clients into storage
+  const seeded = deduplicateClients(SEED_CLIENTS);
   try {
-    localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(SEED_CLIENTS));
+    localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(seeded));
   } catch {}
-  return SEED_CLIENTS;
+  return seeded;
 }
 
 /**
@@ -300,20 +353,22 @@ export function saveClient(client: ClientProspect): ClientProspect[] {
     ];
   }
 
+  const cleanUpdated = deduplicateClients(updated);
   try {
-    localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(updated));
+    localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(cleanUpdated));
   } catch (err) {
     console.error('Failed to save client:', err);
   }
-  return updated;
+  return cleanUpdated;
 }
 
 /**
  * Save full array of clients
  */
 export function saveAllClients(clients: ClientProspect[]): void {
+  const cleanClients = deduplicateClients(clients);
   try {
-    localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(clients));
+    localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(cleanClients));
   } catch (err) {
     console.error('Failed to save all clients:', err);
   }

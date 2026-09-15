@@ -207,6 +207,175 @@ export const ClientAuditDossierModal: React.FC<ClientAuditDossierModalProps> = (
             </div>
           </div>
 
+          {/* Real Website HTML Audit Breakdown (Strictly verified HTML data) */}
+          {prospect.realAuditDetails && (
+            <div className="p-4 rounded-2xl bg-slate-900 text-white border border-slate-800 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-200">
+                    Real Website HTML Audit Breakdown
+                  </h4>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-cyan-300 border border-cyan-400/30">
+                  {prospect.realAuditDetails.basedOnHomepageOnly ? 'Audit based on homepage only' : 'Full Site Crawl'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-[11px]">
+                {/* Technical */}
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Technical</span>
+                  <div className="space-y-1 text-slate-300">
+                    <div className="flex items-center justify-between">
+                      <span>HTTPS / SSL</span>
+                      <span className={prospect.realAuditDetails.technical.https ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.technical.https ? '✅ Passing' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Sitemap</span>
+                      <span className={prospect.realAuditDetails.technical.sitemap ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.technical.sitemap ? '✅ Found' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Robots.txt</span>
+                      <span className={prospect.realAuditDetails.technical.robotsTxt ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.technical.robotsTxt ? '✅ Found' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Canonical Tag</span>
+                      <span className={prospect.realAuditDetails.technical.canonical ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.technical.canonical ? '✅ Present' : '❌ Missing'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* On-Page */}
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">On-Page SEO</span>
+                  <div className="space-y-1 text-slate-300">
+                    <div className="flex items-center justify-between">
+                      <span>Title Tag</span>
+                      <span className={prospect.realAuditDetails.onPage.titleTag ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.onPage.titleTag ? '✅ Present' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Meta Description</span>
+                      <span className={prospect.realAuditDetails.onPage.metaDescription ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.onPage.metaDescription ? '✅ Present' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>H1 Heading</span>
+                      <span className={prospect.realAuditDetails.onPage.h1 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.onPage.h1 ? '✅ Found' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Image Alt Text</span>
+                      <span className={prospect.realAuditDetails.onPage.altText ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.onPage.altText ? '✅ Optimized' : `❌ ${prospect.realAuditDetails.onPage.missingAltCount} Missing`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Performance */}
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Performance</span>
+                  <div className="space-y-1 text-slate-300">
+                    <div className="flex items-center justify-between">
+                      <span>Page Load Time</span>
+                      <span className={prospect.realAuditDetails.performance.pageLoadTimeMs < 3000 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.performance.pageLoadTimeMs} ms {prospect.realAuditDetails.performance.pageLoadTimeMs < 3000 ? '✅' : '❌ (Slow)'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Image Format</span>
+                      <span className="text-slate-200 font-medium truncate max-w-[120px]">
+                        {prospect.realAuditDetails.performance.imageFormat}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile */}
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Mobile UX</span>
+                  <div className="space-y-1 text-slate-300">
+                    <div className="flex items-center justify-between">
+                      <span>Viewport Meta Tag</span>
+                      <span className={prospect.realAuditDetails.mobile.viewportMeta ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.mobile.viewportMeta ? '✅ Present' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Touch Targets</span>
+                      <span className={prospect.realAuditDetails.mobile.touchTargets ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                        {prospect.realAuditDetails.mobile.touchTargets ? '✅ Passing' : '⚠️ Inspect'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Schema */}
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Structured Data (Schema)</span>
+                  <div className="space-y-1 text-slate-300">
+                    <div className="flex items-center justify-between">
+                      <span>LocalBusiness Schema</span>
+                      <span className={prospect.realAuditDetails.schema.localBusiness ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.schema.localBusiness ? '✅ Active' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>FAQ Schema</span>
+                      <span className={prospect.realAuditDetails.schema.faq ? 'text-emerald-400 font-bold' : 'text-slate-400'}>
+                        {prospect.realAuditDetails.schema.faq ? '✅ Active' : '❌ Not Detected'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Review / Aggregate Schema</span>
+                      <span className={prospect.realAuditDetails.schema.review ? 'text-emerald-400 font-bold' : 'text-slate-400'}>
+                        {prospect.realAuditDetails.schema.review ? '✅ Active' : '❌ Not Detected'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact On Page */}
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">On-Page Contact Details</span>
+                  <div className="space-y-1 text-slate-300">
+                    <div className="flex items-center justify-between">
+                      <span>Phone on Page</span>
+                      <span className={prospect.realAuditDetails.contact.phoneOnPage ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.contact.phoneOnPage ? '✅ Found' : '❌ Missing'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Email on Page</span>
+                      <span className={prospect.realAuditDetails.contact.emailOnPage ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                        {prospect.realAuditDetails.contact.emailOnPage ? '✅ Found' : '⚠️ Form Only'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Address on Page</span>
+                      <span className={prospect.realAuditDetails.contact.addressOnPage ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {prospect.realAuditDetails.contact.addressOnPage ? '✅ Found' : '❌ Missing'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* 12 Individual Technical Audits List */}
           <div className="space-y-3">
             <ClientIndividualAuditsView
